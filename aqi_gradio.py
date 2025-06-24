@@ -55,20 +55,45 @@ class AQIAnalyzer:
     
     def fetch_aqi_data(self, city: str, state: str, country: str) -> tuple[Dict[str, float], str]:
         """Fetch API data using Firecrawl"""
-        url = self._format_url(country, state, city)
-        info_msg = f"Accessing URL: {url}"
+        try:
+            url = self._format_url(country, state, city)
+            info_msg = f"Accessing URL: {url}"
+            
+            resp = self.firecrawl.extract(
+                urls = [f"{url}/*"],
+                params = {
+                    "prompt" : "Extract the current real-time AQI, temperature, humidity, wind speed, PM2.5, PM10 and CO Levels from the page. Also extract the timestamp of the data.",
+                    "schema": ExtractSchema.model_json_schema()
+                }
+            )
+            
+            aqi_response = AQIResponse(**resp)
+            
+            if not aqi_response.success:
+                raise requests.HTTPError(f"Failed to fetch AQI Data: {aqi_response.status}")
+            
+            return aqi_response.data, info_msg
         
-        resp = self.firecrawl.extract(
-            urls = [f"{url}/*"],
-            params = {
-                "prompt" : "Extract the current real-time AQI, temperature, humidity, wind speed, PM2.5, PM10 and CO Levels from the page. Also extract the timestamp of the data.",
-                "schema": ExtractSchema.model_json_schema()
-            }
+        except Exception as e:
+            error_msg = f"Error Fetching AQI Data: {str(e)}"
+            return {
+                "api": 0,
+                "temperature": 0,
+                "humidity": 0,
+                "wind_speed": 0,
+                "pm25": 0,
+                "pm10": 0,
+                "co": 0
+            }, error_msg
+
+class HealthRecommendationAgent:
+    
+    def __init__(self, openai_key: str) -> Agent:
+        
+        self.agent = Agent(
+            model = OpenAIChat(
+            id = "gpt-4.1-nano",
+            name = "Health Recommendation Agent",
+            api_key = os.environ["OPENAI_API_KEY"]
+            )
         )
-        
-        aqi_response = AQIResponse(**resp)
-        
-        if not aqi_response.success:
-            raise requests.HTTPError(f"Failed to fetch AQI Data: {aqi_response.status}")
-        
-        return aqi_response.data, info_msg
