@@ -1,12 +1,15 @@
+import os
 import json
 import gradio as gr
 from agno.agent import Agent
+from dotenv import load_dotenv
 from dataclasses import dataclass
 from typing import Dict, Optional
 from firecrawl import FirecrawlApp
 from pydantic import BaseModel, Field
 from agno.models.openai import OpenAIChat
 
+load_dotenv()
 
 class AQIResponse(BaseModel):
     success: bool
@@ -30,3 +33,8 @@ class UserInput:
     country: str
     medical_conditions: Optional[str]
     planned_activity: str
+    
+class AQIAnalyzer:
+    
+    def __init__(self):
+        self.firecrawl = FirecrawlApp(api_key = os.getenv("firecrawl_key"))
