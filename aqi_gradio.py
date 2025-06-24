@@ -36,5 +36,7 @@ class UserInput:
     
 class AQIAnalyzer:
     
-    def __init__(self):
+    def __init__(self, firecrawl_key : str) -> None:
         self.firecrawl = FirecrawlApp(api_key = os.getenv("firecrawl_key"))
+    
+    
