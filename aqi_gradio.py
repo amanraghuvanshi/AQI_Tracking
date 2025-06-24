@@ -89,7 +89,6 @@ class AQIAnalyzer:
 class HealthRecommendationAgent:
     
     def __init__(self, openai_key: str) -> Agent:
-        
         self.agent = Agent(
             model = OpenAIChat(
             id = "gpt-4.1-nano",
@@ -97,3 +96,14 @@ class HealthRecommendationAgent:
             api_key = os.environ["OPENAI_API_KEY"]
             )
         )
+        
+    def _create_prompt(self, aqi_data: Dict[str, float], user_input: UserInput) -> str:
+        return f"""
+        Based on the following air quality condition in 
+    """
+    
+    def get_recommendation(self, aqi_data: Dict[str, float], user_input: UserInput) -> str:
+        prompt = self._create_prompt(prompt)
+        resp = self.agent.run(prompt)
+        
+        return resp.content
