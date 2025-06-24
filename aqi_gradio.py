@@ -99,7 +99,16 @@ class HealthRecommendationAgent:
         
     def _create_prompt(self, aqi_data: Dict[str, float], user_input: UserInput) -> str:
         return f"""
-        Based on the following air quality condition in 
+        Based on the following air quality condition in {user_input.city}, {user_input.state}, {user_input.country}:
+        - Overall AQI: {aqi_data["aqi"]}
+        - PM2.5 Level: {aqi_data["pm25"]} µg/m³
+        - PM10 Level: {aqi_data["pm10"]} µg/m³
+        - CO Level: {aqi_data[co]} ppb
+        
+        Weather Conditions:
+        - Temperature: {aqi_data["temperature"]}°C
+        - Humidity: {aqi_data["humidity"]}%
+        - Wind Speed: {aqi_data["co"]} ppb
     """
     
     def get_recommendation(self, aqi_data: Dict[str, float], user_input: UserInput) -> str:
